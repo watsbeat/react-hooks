@@ -3,17 +3,20 @@
 
 import * as React from 'react'
 
-function Greeting({initialName = ''}) {
-  console.log('rendering...')
-  const [name, setName] = React.useState(
-    () => window.localStorage.getItem('name') || initialName,
+function useSyncLocalStorageWithState(key, defaultValue) {
+  const [state, setState] = React.useState(
+    () => window.localStorage.getItem(key) || defaultValue,
   )
 
   React.useEffect(() => {
-    console.log('calling useEffect')
-    window.localStorage.setItem('name', name)
-  }, [name]) // Only re-run the effect if dependecy in array changes → uses === Object.is
+    window.localStorage.setItem(key, state)
+  }, [key, state])
 
+  return [state, setState]
+}
+
+function Greeting({initialName = ''}) {
+  const [name, setName] = useSyncLocalStorageWithState(initialName)
   function handleChange(event) {
     setName(event.target.value)
   }
